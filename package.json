@@ -8,7 +8,7 @@
     "start": "bun ./dist/app.js",
     "lint": "eslint . --no-ignore",
     "dev": "bun run lint && nodemon ./src/app.ts",
-    "build": "bunx rollup -c"
+    "build": "bun build ./src/app.ts --outdir ./dist --target bun"
   },
   "keywords": [],
   "dependencies": {
@@ -17,7 +17,9 @@
     "@types/bun": "^1.2.17",
     "@upstash/rag-chat": "^2.0.3",
     "@upstash/vector": "^1.2.2",
-    "dotenv": "^17.0.1"
+    "dotenv": "^17.0.1",
+    "jimp": "^1.6.0",
+    "link-preview-js": "^3.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
@@ -25,9 +27,7 @@
     "@typescript-eslint/parser": "^7.4.0",
     "eslint": "^8.52.0",
     "eslint-plugin-builderbot": "latest",
-    "rollup": "^4.10.0",
     "nodemon": "^3.1.0",
-    "rollup-plugin-typescript2": "^0.36.0",
     "tsx": "^4.7.1",
     "typescript": "^5.4.3"
   },

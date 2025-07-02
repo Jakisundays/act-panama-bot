@@ -13,7 +13,7 @@ import * as dotenv from "dotenv";
 import flows from "./flows";
 dotenv.config();
 
-const PORT = process.env.PORT ?? 3008;
+const PORT = process.env.PORT ?? 3015;
 
 const TOGETHER_AI_KEY = process.env.TOGETHER_AI_KEY;
 const UPSTASH_VECTOR_REST_TOKEN = process.env.UPSTASH_VECTOR_REST_TOKEN;

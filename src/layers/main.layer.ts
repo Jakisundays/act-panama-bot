@@ -50,15 +50,13 @@ export default async (
     data: { output, context },
   } = response;
 
-  
+  const chunks = output.split(/(?<!\d)\.\s+/g);
+  for (const chunk of chunks!) {
+    await flowDynamic([{ body: chunk.trim(), delay: generateTimer(250, 350) }]);
+  }
 
   await handleHistory({ content: output, role: "assistant" }, state);
 
-  const chunks = output.split(/(?<!\d)\.\s+/g);
-  for (const chunk of chunks!) {
-    await flowDynamic([{ body: chunk.trim(), delay: generateTimer(150, 250) }]);
-  }
-  
   // Enviar el contexto usando flowDynamic
   if (context && context.length > 0) {
     await flowDynamic([
@@ -67,14 +65,19 @@ export default async (
         delay: generateTimer(200, 300),
       },
     ]);
-    
+
     for (const item of context) {
-      const contextMessage = `\n📖 *${item.metadata.titulo}*\n` +
-         `📄 Artículo: ${item.metadata.articulo}\n` +
-         (item.metadata.capitulo ? `📋 Capítulo: ${item.metadata.capitulo}\n` : '') +
-         `📝 Texto: ${item.metadata.texto.substring(0, 200)}${item.metadata.texto.length > 200 ? '...' : ''}\n` +
-         `🔗 Ver completo: https://nomejodasweb.pages.dev/constitucion/${item.metadata.articulo}`;
-      
+      const contextMessage =
+        `\n📖 *${item.metadata.titulo}*\n` +
+        `📄 Artículo: ${item.metadata.articulo}\n` +
+        (item.metadata.capitulo
+          ? `📋 Capítulo: ${item.metadata.capitulo}\n`
+          : "") +
+        `📝 Texto: ${item.metadata.texto.substring(0, 200)}${
+          item.metadata.texto.length > 200 ? "..." : ""
+        }\n` +
+        `🔗 Ver completo: https://nomejodasweb.pages.dev/constitucion/${item.metadata.articulo}`;
+
       await flowDynamic([
         {
           body: contextMessage,

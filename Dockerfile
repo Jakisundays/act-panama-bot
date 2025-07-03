@@ -1,5 +1,5 @@
 # Image size ~ 300MB
-FROM oven/bun:1 AS builder
+FROM oven/bun:latest AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY . .
 RUN bun run build
 
 # Production stage
-FROM oven/bun:1 AS deploy
+FROM oven/bun:latest AS deploy
 
 WORKDIR /app
 

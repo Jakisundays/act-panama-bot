@@ -23,15 +23,18 @@ COPY . .
 # Install dependencies using PNPM
 RUN pnpm install
 
+# Build the TypeScript application
+RUN pnpm run build
+
 # Create a new stage for deployment
 FROM builder as deploy
 
-# Copy only necessary files and directories for deployment
-COPY --from=builder /app/src ./src
+# Copy the built application and necessary files
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 
 # Install production dependencies using frozen lock file
 RUN pnpm install --frozen-lockfile --production
 
 # Define the command to start the application using PM2 runtime
-CMD ["pm2-runtime", "start", "./src/app.js", "--cron", "0 */12 * * *"]
+CMD ["pm2-runtime", "start", "./dist/app.js", "--cron", "0 */12 * * *"]

@@ -1,51 +1,37 @@
-# Image size ~ 300MB
-FROM oven/bun:latest AS builder
+# Use the official Node.js image as the base image for building the application.
+FROM node:21-alpine3.18 as builder
 
+# Enable Corepack and prepare for PNPM installation
+RUN corepack enable && corepack prepare pnpm@latest --activate
+ENV PNPM_HOME=/usr/local/bin
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package files
-COPY package.json bun.lockb ./
+# Copy package.json and pnpm-lock.yaml files to the working directory
+COPY package*.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN bun install --frozen-lockfile
+# Install git for potential dependencies
+RUN apk add --no-cache git
 
-# Copy source code
+# Install PM2 globally using PNPM
+RUN pnpm install pm2 -g
+
+# Copy the application source code into the container
 COPY . .
 
-# Build the application
-RUN bun run build
+# Install dependencies using PNPM
+RUN pnpm install
 
-# Production stage
-FROM oven/bun:latest AS deploy
+# Create a new stage for deployment
+FROM builder as deploy
 
-WORKDIR /app
+# Copy only necessary files and directories for deployment
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 
-ARG PORT
-ENV PORT=$PORT
-EXPOSE $PORT
+# Install production dependencies using frozen lock file
+RUN pnpm install --frozen-lockfile --production
 
-# Copy built application and package files
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/bun.lockb ./
-
-# Install only production dependencies
-RUN bun install --frozen-lockfile --production
-
-# Install cron for scheduled restarts
-RUN apt-get update && apt-get install -y cron && rm -rf /var/lib/apt/lists/*
-
-# Create restart script
-RUN echo '#!/bin/bash\n\necho "$(date): Restarting bot..."\npkill -f "bun.*app.js" || true\nsleep 2\nbun /app/dist/app.js &\necho "$(date): Bot restarted"' > /app/restart-bot.sh && chmod +x /app/restart-bot.sh
-
-# Create startup script that handles cron as root then switches to bunuser
-RUN echo '#!/bin/bash\n\n# Setup cron job for restart every 12 hours as root\necho "0 */12 * * * /app/restart-bot.sh >> /app/restart.log 2>&1" | crontab -\n\n# Start cron as root\ncron\n\n# Switch to bunuser and start the bot\nsu bunuser -c "bun /app/dist/app.js"' > /app/start-with-cron.sh && chmod +x /app/start-with-cron.sh
-
-# Create non-root user
-RUN groupadd -r bunuser --gid=1001 && useradd -r -g bunuser --uid=1001 --home-dir=/app --shell=/bin/bash bunuser
-
-# Change ownership of app directory
-RUN chown -R bunuser:bunuser /app
-
-# Start with cron-based restart (keeping root for cron, switching to bunuser for bot)
-CMD ["/app/start-with-cron.sh"]
+# Define the command to start the application using PM2 runtime
+CMD ["pm2-runtime", "start", "./src/app.js", "--cron", "0 */12 * * *"]

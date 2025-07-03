@@ -19,9 +19,15 @@ const TOGETHER_AI_KEY = process.env.TOGETHER_AI_KEY;
 const UPSTASH_VECTOR_REST_TOKEN = process.env.UPSTASH_VECTOR_REST_TOKEN;
 const UPSTASH_VECTOR_REST_URL = process.env.UPSTASH_VECTOR_REST_URL;
 
-console.log('TOGETHER_AI_KEY:', TOGETHER_AI_KEY ? 'Loaded' : 'Missing');
-console.log('UPSTASH_VECTOR_REST_TOKEN:', UPSTASH_VECTOR_REST_TOKEN ? 'Loaded' : 'Missing');
-console.log('UPSTASH_VECTOR_REST_URL:', UPSTASH_VECTOR_REST_URL ? 'Loaded' : 'Missing');
+console.log("TOGETHER_AI_KEY:", TOGETHER_AI_KEY ? "Loaded" : "Missing");
+console.log(
+  "UPSTASH_VECTOR_REST_TOKEN:",
+  UPSTASH_VECTOR_REST_TOKEN ? "Loaded" : "Missing"
+);
+console.log(
+  "UPSTASH_VECTOR_REST_URL:",
+  UPSTASH_VECTOR_REST_URL ? "Loaded" : "Missing"
+);
 
 if (!TOGETHER_AI_KEY) {
   throw new Error("Missing required environment variable: TOGETHER_AI_KEY");

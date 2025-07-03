@@ -20,6 +20,7 @@ class Bot {
     this.ragChat = new RAGChat({
       model: togetherai(model, {
         apiKey: TOGETHER_AI_KEY,
+        
       }),
       vector: new Index({
         token: UPSTASH_VECTOR_REST_TOKEN,

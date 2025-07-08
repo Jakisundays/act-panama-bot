@@ -76,7 +76,7 @@ export default async (
         `📝 Texto: ${item.metadata.texto.substring(0, 200)}${
           item.metadata.texto.length > 200 ? "..." : ""
         }\n` +
-        `🔗 Ver completo: https://nomejodasweb.pages.dev/constitucion/${item.metadata.articulo}`;
+        `🔗 Ver completo: https://actpanama.com/constitucion/${item.metadata.articulo}`;
 
       await flowDynamic([
         {
